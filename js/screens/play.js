@@ -9,8 +9,8 @@ game.PlayScreen = me.ScreenObject.extend({
 
 
         me.levelDirector.loadLevel("level1");
-       
-        
+
+
 
         var player = me.pool.pull("player", 0, 420, {});
         me.game.world.addChild(player, 5);
@@ -19,7 +19,7 @@ game.PlayScreen = me.ScreenObject.extend({
         me.input.bindKey(me.input.KEY.RIGHT, "right");
         me.input.bindKey(me.input.KEY.LEFT, "left");
         me.input.bindKey(me.input.KEY.UP, "jump", true);
-
+        me.input.bindKey(me.input.key.space, "atack");
 
         // add our HUD to the game world
         this.HUD = new game.HUD.Container();
