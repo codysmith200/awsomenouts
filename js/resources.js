@@ -6,9 +6,9 @@ game.resources = [
     {name: "background-tiles", type: "image", src: "data/img/background-tiles.png"},
     {name: "meta-tiles", type: "image", src: "data/img/meta-tiles.png"},
     {name: "player", type: "image", src: "data/img/orcSpear.png"},
-     {name: "tower", type: "image", src: "data/img/tower_round.svg.png"},
-     {name: "creep1", type: "image", src: "data/img/brainmonster.png"},
-    
+    {name: "tower", type: "image", src: "data/img/tower_round.svg.png"},
+    {name: "creep1", type: "image", src: "data/img/brainmonster.png"},
+    {name: "devil", type: "image", src: "data/img/devil.jpg"},
     /* Atlases 
      * @example
      
@@ -19,12 +19,13 @@ game.resources = [
      * example01", type: "tmx", src: "data/map/example01.tmx"},{name: "
      * {name: "example01", type: "tmx", src: "data/map/example01.json"},
      */
-    {name: "level1", type: "tmx", src: "data/map/bob.tmx"}
-   
+    {name: "level1", type: "tmx", src: "data/map/bob.tmx"},
     /* Background music. 
      * @example
      * {name: "example_bgm", type: "audio", src: "data/bgm/"},
      */
+    {name: "music", type: "audio", src: "data/bgm/"}
+
 
     /* Sound effects. 
      * @example

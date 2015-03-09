@@ -11,8 +11,8 @@ game.playerEntity = me.Entity.extend({
                 }
             }]);
 
-
-        this.body.setVelocity(5, 20);
+        this.type = "playerEnitiy";
+        this.body.setVelocity(6, 20);
 
 
         me.game.viewport.follow(this.pos, me.game.viewport.AXIS.BOTH);
@@ -21,10 +21,12 @@ game.playerEntity = me.Entity.extend({
         this.renderable.addAnimation("atack", [65, 67, 68, 68, 69, 70, 71, 72], 80);
     },
     update: function(delta) {
+
         if (me.input.isKeyPressed("right")) {
             this.body.vel.x += this.body.accel.x * me.timer.tick;
             this.flipX(true);
         }
+
         else if (me.input.isKeyPressed('left')) {
             this.body.vel.x -= this.body.accel.x * me.timer.tick;
             this.flipX(false);
@@ -42,27 +44,53 @@ game.playerEntity = me.Entity.extend({
         }
 
         if (me.input.isKeyPressed("atack")) {
-            console.log("atack1");
             if (!this.renderable.isCurrentAnimation("atack")) {
-                console.log("atack2");
-                this.renderable.addAnimation("atack");
+                console.log(this.renderable.isCurrentAnimation("atack"));
+                this.renderable.setCurrentAnimation("atack", "idle");
+
                 this.renderable.setAnimationFrame();
             }
         }
-        else if (this.body.vel.x !== 0) {
+        else if (this.body.vel.x !== 0 && !this.renderable.isCurrentAnimation("atack")) {
             if (!this.renderable.isCurrentAnimation("walk")) {
                 this.renderable.setCurrentAnimation("walk");
             }
         }
-        else {
+        else if (!this.renderable.isCurrentAnimation("atack")) {
             this.renderable.setCurrentAnimation("idle");
         }
 
         this.body.update(delta);
         this._super(me.Entity, "update", [delta]);
         return true;
+    },
+    loseHealth: function(damage) {
+        this.health = this.health - damage;
+    },
+    collideHandler: function(response) {
+        if (response.b.type === "playerBase") {
+            this.atacking = true;
+            this.lastatacking = true;
+            this.body.vel.x = 0;
+            this.pos.x = this.pos.x + 1;
+            if ((this.now - this.lastHit >= 1000)) {
+                this.lastHit = this.now;
+                response.b.loseHealth(1);
+            }
+        } else if (response.b.type === "playerEntitity") {
+            this.atacking = true;
+            //this.lastatacking = true;
+            this.body.vel.x = 0;
+            this.pos.x = this.pos.x + 1;
+            if ((this.now - this.lastHit >= 1000)) {
+                this.lastHit = this.now;
+                response.b.loseHealth(1);
+            }
+        }
     }
+
 });
+
 game.playerBaseEntitiy = me.Entity.extend({
     init: function(x, y, settings) {
         this._super(me.Entity, 'init', [x, y, {
@@ -79,7 +107,7 @@ game.playerBaseEntitiy = me.Entity.extend({
         this.health = 10;
         this.alwaysUpdate = true;
         this.body.onCollision = this.onCollision.bind(this);
-        this.type = "playerBaseEntity";
+        this.type = "playerBase";
 
         this.renderable.addAnimation("idle", [0]);
         this.renderable.addAnimation("broken", [1]);
@@ -93,6 +121,9 @@ game.playerBaseEntitiy = me.Entity.extend({
         this.body.update(delta);
         this._super(me.Entity, "update", [delta]);
         return true;
+    },
+    loseHealth: function(damage) {
+        this.health = this.health - damage;
     },
     onCollision: function() {
 
@@ -153,38 +184,68 @@ game.EnemyCreep = me.Entity.extend({
 
         this.health - 10;
         this.allwaysupdate = true;
-
-        this.body.setVelocity(3, 20);
+        this.atacking = false;
+        this.lastAtacking = new Date().getTime();
+        this.lastHit = new Date().getTime();
+        this.now = new Date().getTime();
+        this.body.setVelocity(1, 20);
 
         this.type = "EnemyCreep";
 
         this.renderable.addAnimation("walk", [3, 4, 5], 80);
         this.renderable.setCurrentAnimation("walk");
     },
-    update: function() {
+    update: function(delta) {
+        this.now = new Date().getTime();
+        this.body.update(delta);
+        this.body.vel.x -= this.body.accel.x * me.timer.tick;
+        me.collision.check(this, true, this.collideHandler.bind(this), true);
+        this._super(me.Entity, "update", [delta]);
+        return true;
 
+
+    },
+    collideHandler: function(response) {
+        if (response.b.type === "playerBase") {
+            this.atacking = true;
+            this.lastatacking = true;
+            this.body.vel.x = 0;
+            this.pos.x = this.pos.x + 1;
+            if ((this.now - this.lastHit >= 1000)) {
+                this.lastHit = this.now;
+                response.b.loseHealth(1);
+            }
+        } else if (response.b.type === "playerEntitity") {
+            this.atacking = true;
+            //this.lastatacking = true;
+            this.body.vel.x = 0;
+            this.pos.x = this.pos.x + 1;
+            if ((this.now - this.lastHit >= 1000)) {
+                this.lastHit = this.now;
+                response.b.loseHealth(1);
+            }
+        }
     }
 });
 
 game.GameManager = Object.extend({
-    init: function(x, y, settings){
+    init: function(x, y, settings) {
         this.now = new Date().getTime();
         this.lastCreep = new Date().getTime();
         this.alwaysUpdate = true;
     },
-    
-    update: function(){
-      this.now = new Date().getTime();
-      
-      if(Math.round(this.now/1000)%10 ===0 && (this.now - this.lastCreep >= 1000)){
-          this.lastCreep = this.now;
-          var creepe = me.pool.pull("EnemyCreep", 10, 19, {});
-          me.game.world.addChild(creepe, 5);
-          
-          
-      }
-      
-     return true;
+    update: function() {
+        this.now = new Date().getTime();
+
+        if (Math.round(this.now / 1000) % 10 === 0 && (this.now - this.lastCreep >= 1000)) {
+            this.lastCreep = this.now;
+            var creepe = me.pool.pull("EnemyCreep", 5000, 150, {});
+            me.game.world.addChild(creepe, 5);
+
+
+        }
+
+        return true;
     }
-    
+
 });
