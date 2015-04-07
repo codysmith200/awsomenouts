@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.0" orientation="orthogonal" width="30" height="9" tilewidth="70" tileheight="70">
+ <tileset firstgid="1" name="background-tiles" tilewidth="70" tileheight="70">
+  <image source="../img/background-tiles.png" width="910" height="910"/>
+ </tileset>
+ <tileset firstgid="170" name="meta-tiles" tilewidth="70" tileheight="70">
+  <image source="../img/meta-tiles.png" width="350" height="70"/>
+  <tile id="4">
+   <properties>
+    <property name="type" value="solid"/>
+   </properties>
+  </tile>
+ </tileset>
+ <layer name="background" width="30" height="9">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFwxmI0BmPREBvf2MLb3rHMwBe0wSx
+  </data>
+ </layer>
+ <layer name="collision" width="30" height="9">
+  <data encoding="base64" compression="zlib">
+   eJxjYBgFwxmsozMeiYDe/sYW3vSOZwCYoijJ
+  </data>
+ </layer>
+ <objectgroup name="levelEntities" width="30" height="9">
+  <object name="leveltrigger" x="0" y="140" width="70" height="140">
+   <properties>
+    <property name="level" value="level2"/>
+   </properties>
+  </object>
+  <object x="0" y="-420"/>
+  <object x="420" y="-630"/>
+ </objectgroup>
+</map>

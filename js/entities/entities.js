@@ -1,4 +1,4 @@
-game.playerEntity = me.Entity.extend({
+ game.playerEntity = me.Entity.extend({
     init: function(x, y, settings) {
         this._super(me.Entity, 'init', [x, y, {
                 image: "player",
@@ -172,7 +172,7 @@ game.EnemyCreep = me.Entity.extend({
         this._super(me.Entity, 'init', [x, y, {
                 image: "creep1",
                 width: 32,
-                height: 64,
+                 height: 64,
                 spritewidth: "32",
                 spriteheight: "64",
                 getShape: function() {
@@ -188,7 +188,7 @@ game.EnemyCreep = me.Entity.extend({
         this.lastAtacking = new Date().getTime();
         this.lastHit = new Date().getTime();
         this.now = new Date().getTime();
-        this.body.setVelocity(1, 20);
+        this.body.setVelocity(3, 20);
 
         this.type = "EnemyCreep";
 
@@ -203,11 +203,13 @@ game.EnemyCreep = me.Entity.extend({
         this._super(me.Entity, "update", [delta]);
         return true;
 
+this.body.update(delta);
+me.collision.check(this, true, this.collideHandler.bind(this), true);
 
     },
     collideHandler: function(response) {
         if (response.b.type === "playerBase") {
-            this.atacking = true;
+            this.atacking = true;    
             this.lastatacking = true;
             this.body.vel.x = 0;
             this.pos.x = this.pos.x + 1;
@@ -246,6 +248,26 @@ game.GameManager = Object.extend({
         }
 
         return true;
+    },
+    collideHandler: function(response){
+        
     }
 
+ 
+});
+        game.LevelTrigger = me.Entity.extend({
+    init: function(x, y, settings) {
+        this._super(me.Entity, "init", [x, y, settings]);
+        this.body.onCollision = this.onCollision.bind(this);
+        this.level = settings.level;
+        
+        
+
+    },
+    onCollision: function() {
+        this.body.setCollisionMask(me.collision.types.NO_OBJECT);
+        me.levelDirector.loadLevel(this.level);
+        me.state.current().resetPlayer(x, y);
+
+    }
 });
